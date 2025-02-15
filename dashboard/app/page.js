@@ -1,58 +1,72 @@
-// app/page.js
-// (Note: no "use client"; so this is a server component)
+"use client";
 
-import stakekit from '@api/stakekit';
+import { useState } from "react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors";
 
-export default async function Home() {
-  // Call the StakeKit API directly on the server.
-  let yieldData = null;
-  try {
-    const { data } = await stakekit.yieldv2Controller_yields();
-    yieldData = data;
-  } catch (err) {
-    console.error("Error fetching yield data:", err);
-  }
+export default function Home() {
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect({ connector: new InjectedConnector() });
+  const { disconnect } = useDisconnect();
 
-  // (Optional) Fetch internal status data here—
-  // you could call your own helper functions or another API route.
-  // For demonstration purposes, we'll use dummy status data.
-  const status = {
-    txHistory: [], // replace with real transaction history
-    decision: {}   // replace with real decision engine status
+  const [domainName, setDomainName] = useState("");
+  const [registrar, setRegistrar] = useState("godaddy");
+
+  const handleMint = async () => {
+    // Placeholder: Replace with your actual minting API call or contract interaction.
+    alert(`Minting NFT for domain "${domainName}" with registrar "${registrar}"`);
+  };
+
+  const handleBurn = async () => {
+    // Placeholder: Replace with your actual burn API call or contract interaction.
+    alert(`Burning NFT for domain "${domainName}" (Refund 80%)`);
   };
 
   return (
     <div className="p-6 font-sans">
-      <h1 className="text-3xl font-bold mb-4">Immortal Domains Dashboard</h1>
-      
-      {/* StakeKit Yield Data Section */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">StakeKit Yield Data</h2>
-        {yieldData ? (
-          <pre className="bg-gray-100 p-2 rounded">
-            {JSON.stringify(yieldData, null, 2)}
-          </pre>
-        ) : (
-          <p>Error fetching yield data.</p>
-        )}
-      </div>
-
-      {/* Additional Status Data Section */}
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Status Data</h2>
+      <h1 className="text-3xl font-bold mb-4">Immortal Domains</h1>
+      {!isConnected ? (
+        <button onClick={() => connect()} className="btn btn-primary">
+          Connect Wallet
+        </button>
+      ) : (
         <div>
-          <h3 className="text-lg font-semibold">Recent Transactions</h3>
-          <pre className="bg-gray-100 p-2 rounded">
-            {JSON.stringify(status.txHistory, null, 2)}
-          </pre>
+          <p>Connected: {address}</p>
+          <button onClick={() => disconnect()} className="btn btn-secondary">
+            Disconnect Wallet
+          </button>
+          <div className="mt-4">
+            <label className="block mb-1">Domain Name</label>
+            <input
+              type="text"
+              value={domainName}
+              onChange={(e) => setDomainName(e.target.value)}
+              placeholder="Enter domain name"
+              className="border p-2 w-full"
+            />
+          </div>
+          <div className="mt-4">
+            <label className="block mb-1">Registrar</label>
+            <select
+              value={registrar}
+              onChange={(e) => setRegistrar(e.target.value)}
+              className="border p-2 w-full"
+            >
+              <option value="godaddy">GoDaddy</option>
+              <option value="namecheap">Namecheap</option>
+              <option value="placeholder">Placeholder Registrar</option>
+            </select>
+          </div>
+          <div className="mt-4">
+            <button onClick={handleMint} className="btn btn-success mr-2">
+              Mint Domain NFT ($100)
+            </button>
+            <button onClick={handleBurn} className="btn btn-warning">
+              Burn NFT (Refund 80%)
+            </button>
+          </div>
         </div>
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Decision Engine Status</h3>
-          <pre className="bg-gray-100 p-2 rounded">
-            {JSON.stringify(status.decision, null, 2)}
-          </pre>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
