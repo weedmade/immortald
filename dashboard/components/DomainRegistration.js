@@ -9,7 +9,7 @@ export default function DomainRegistration({ onMint, onBurn }) {
   const { connect } = useConnect({ connector: new InjectedConnector() });
   
   const [domainName, setDomainName] = useState("");
-  const [registrar, setRegistrar] = useState("godaddy"); // default value
+  const [registrar, setRegistrar] = useState("godaddy"); // default
 
   return (
     <div className="p-4">
@@ -59,4 +59,3 @@ export default function DomainRegistration({ onMint, onBurn }) {
     </div>
   );
 }
-

@@ -1,22 +1,27 @@
-// app/api/status/route.js
+// dashboard/app/api/mint/route.js
+import { NextResponse } from "next/server";
+import { ethers } from "ethers";
+import domainNftAbi from "@/abi/domainNftAbi.json"; // adjust the path if needed
 
-export async function GET(request) {
-  // Dummy status data – replace this with real data as needed.
-  const status = {
-    yieldData: {
-      pools: [
-        { id: 1, name: "Pool A", APY: 0.35 },
-        { id: 2, name: "Pool B", APY: 0.28 }
-      ]
-    },
-    txHistory: [
-      { txHash: "0x942a6bbf...", status: "Success", timestamp: "2025-02-14T04:23:00Z" }
-    ],
-    decision: "Rebalance triggered"
-  };
+const DOMAIN_NFT_ADDRESS = process.env.DOMAIN_NFT_ADDRESS; 
 
-  return new Response(JSON.stringify(status), {
-    status: 200,
-    headers: { "Content-Type": "application/json" }
-  });
+export async function POST(request) {
+  try {
+    // If your contract function does not accept parameters,
+    // you can remove domainName and registrar from the call.
+    // const { domainName, registrar } = await request.json();
+
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = new ethers.Contract(DOMAIN_NFT_ADDRESS, domainNftAbi, wallet);
+
+    // If your mint function is named "mintDomainNFT" and takes no parameters:
+    const tx = await contract.mintDomainNFT();
+    await tx.wait();
+
+    return NextResponse.json({ success: true, txHash: tx.hash });
+  } catch (error) {
+    console.error("Mint API error:", error);
+    return NextResponse.error();
+  }
 }

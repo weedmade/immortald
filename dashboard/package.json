@@ -3,17 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "next dev",           
+    "build": "next build",      
+    "start": "next start",       
+    "lint": "next lint"          
   },
   "dependencies": {
-    "@stakekit/api-hooks": "^0.0.95",
+    "@stakekit/api-hooks": "^0.0.95",   
     "@tanstack/react-query": "^5.66.0",
+    "ethers": "^6.13.5",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "wagmi": "^2.14.11"               
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
