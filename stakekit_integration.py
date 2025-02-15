@@ -1,32 +1,33 @@
 import os
 import requests
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load API Key from environment or replace with your key
+STAKEKIT_API_KEY = "f8ba6223-ac90-47a5-9ffc-d563de0a37c8"
+BASE_URL = "https://api.stakek.it/v2"
 
-# Retrieve the API key and base URL from environment variables
-STAKEKIT_API_KEY = os.getenv("STAKEKIT_API_KEY")
-BASE_URL = os.getenv("STAKEKIT_BASE_URL", "https://api.stakek.it/v2")
-
-# Define the endpoint
-YIELDS_ENDPOINT = f"{BASE_URL}/yields"
-
-# Set up headers with the API key
+# Define headers
 headers = {
-    "Authorization": f"Bearer {STAKEKIT_API_KEY}",
-    "Accept": "application/json"
+    "accept": "application/json",
+    "X-API-KEY": STAKEKIT_API_KEY
 }
 
-# Make the GET request to the yields endpoint
-response = requests.get(YIELDS_ENDPOINT, headers=headers)
+# Fetch yields with sorting and filtering
+def get_yields():
+    url = f"{BASE_URL}/yields"
+    params = {
+        "network": "polygon",      # Filtering by Ethereum network
+        "limit": 5                  # Limiting the results to 5 items
+    }
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
+        return None
 
-# Check if the request was successful
-if response.status_code == 200:
-    # Parse the JSON response
-    yields_data = response.json()
-    print("Yields Data:")
-    print(yields_data)
-else:
-    print(f"Error fetching yields: {response.status_code}")
-    print(response.text)
+# Example usage
+if __name__ == "__main__":
+    yields = get_yields()
+    if yields:
+        print("Yields:", yields)
